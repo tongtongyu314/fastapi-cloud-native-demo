@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest httpx
+
+      - name: Run tests
+        run: pytest -v
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t fastapi-cloud-native-demo:${{ github.sha }} .
+
+      # 推送到 Docker Hub（需要在仓库 Secrets 中配置 DOCKERHUB_USERNAME / DOCKERHUB_TOKEN）
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Push to Docker Hub
+      #   run: |
+      #     docker tag fastapi-cloud-native-demo:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-cloud-native-demo:${{ github.sha }}
+      #     docker push ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-cloud-native-demo:${{ github.sha }}
+
+      # 推送到 GHCR（GitHub Container Registry，使用 GITHUB_TOKEN 即可）
+      # - name: Login to GHCR
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Push to GHCR
+      #   run: |
+      #     docker tag fastapi-cloud-native-demo:${{ github.sha }} ghcr.io/${{ github.repository_owner }}/fastapi-cloud-native-demo:${{ github.sha }}
+      #     docker push ghcr.io/${{ github.repository_owner }}/fastapi-cloud-native-demo:${{ github.sha }}

@@ -1,0 +1,39 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/library/fastapi-cloud-native-demo
+  tag: "0.1.0"
+  pullPolicy: Never
+
+service:
+  type: ClusterIP
+  port: 8000
+
+env:
+  APP_ENV: prod
+  APP_VERSION: "0.1.2"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  readiness:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+ingress:
+  enabled: false
+  className: ""
+  host: fastapi-demo.local
+  path: /
+  pathType: Prefix
