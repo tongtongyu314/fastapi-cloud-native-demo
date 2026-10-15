@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: docker.io/library/fastapi-cloud-native-demo
-  tag: "0.1.0"
-  pullPolicy: Never
+  repository: fastapi-demo
+  tag: "latest"
+  pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
