@@ -9,6 +9,19 @@ service:
   type: ClusterIP
   port: 8000
 
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 3
+  periodSeconds: 5
+
 env:
   APP_ENV: prod
   APP_VERSION: "0.1.2"
